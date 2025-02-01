@@ -1,2 +1,0 @@
-#oeijlnslkf
-print('powqfnlndskfnlsndf')
