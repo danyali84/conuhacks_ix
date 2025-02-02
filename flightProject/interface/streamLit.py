@@ -8,12 +8,25 @@ import time
 home_Button = st.sidebar.button("Home")
 CP_Button = st.sidebar.button("C&P Button")
 UBar_Button = st.sidebar.button("UBar Button")
+Custom_Button = st.sidebar.button("Custom Button")
 #2 gates between cutsom z
 
-custom_Button1 = st.sidebar.text_input("Custom1", key="gate1", placeholder="Please enter a number")
+if Custom_Button:
+	left_input, right_input = st.columns(2)
+	with left_input:
+		custom1 = st.text_input("Custom1", key="gate1", placeholder="Enter a number")
+	with right_input:
+		custom2 = st.text_input("Custom2", key="gate2", placeholder="Enter a number")
 
 
 # TODO Create a place to display the data frame s
+
+dataframe = pd.DataFrame({
+	'first column': [1, 2, 3, 4],
+    'second column': [10, 20, 30, 40]
+})
+
+st.dataframe(dataframe)
 
 
 # TODO Create a section on the right to display some analytics boxes 

@@ -1,4 +1,5 @@
 import csv
+import os
 
 smoke_jumper_dep=30
 smoke_jumper_op=5000
@@ -25,14 +26,7 @@ medium=100000
 high=200000
 
 
-with open('C:/Users/hgudi/ConHackathon/Firefighters/conuhacks_ix/firefighters/historical_wildfiredata.csv', 'r') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    line_count = 0
-    for row in csv_reader:
-        if line_count == 0:
-            print(f'Column names are {", ".join(row)}')
-            line_count += 1
-        else:
-            print(f'\t{row[0]} works in the {row[1]} department, and was born in {row[2]}.')
-            line_count += 1
-    print(f'Processed {line_count} lines.')
+file_path = os.path.join(os.path.dirname(__file__), 'C:/Users/hgudi/ConHackathon/Firefighters/conuhacks_ix/firefighters/historical_wildfiredata.csv')
+with open(file_path,  'r') as csv_file:
+    csv_reader = csv_file.read()
+    print(csv_reader)
