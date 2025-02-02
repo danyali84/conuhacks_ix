@@ -1,3 +1,4 @@
+# data for each type of deployments
 smoke_jumper_dep = 30
 smoke_jumper_op = 5000
 smoke_jumper_unit = 5
@@ -38,10 +39,3 @@ fire_severity_data = {
     'medium' : ['fire_engines', 'ground_crews'],
     'high' : ['tanker_planes', 'helicopters', 'ground_crews']
 }
-
-# def deployed_cost(deployed_unit):
-#     unit = available_units[deployed_unit]
-#     if unit['units_available'] > 0:
-#         cost = unit['operation_cost']
-#         return cost
-# MOUAHHHAHAHAHAHHAH
