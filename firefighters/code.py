@@ -28,7 +28,6 @@ fire_severity_data = {
 "high" : 200000
 }
 
-<<<<<<< HEAD
 file_name = 'historical_wildfiredata.csv'
 
 fires = []
@@ -96,10 +95,3 @@ print(f"Number of fires delayed: {sum(num_fires_delayed.values())}")
 print(f"Total operational costs: ${total_operational_costs}") 
 print(f"Estimated damage costs from delayed responses: ${sum(damage_costs.values())}") 
 print(f"Fire severity report: {fire_severity}")
-=======
-
-file_path = os.path.join(os.path.dirname(__file__), 'C:/Users/hgudi/ConHackathon/Firefighters/conuhacks_ix/firefighters/historical_wildfiredata.csv')
-with open(file_path,  'r') as csv_file:
-    csv_reader = csv_file.read()
-    print(csv_reader)
->>>>>>> eeb3692817d856c2fac93b30bc76c01ae7b39eb4
