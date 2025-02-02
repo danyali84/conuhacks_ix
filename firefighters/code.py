@@ -1,53 +1,34 @@
 import csv
-import os
 from collections import defaultdict
+import pandas as pd
 
-smoke_jumper_dep = 30
-smoke_jumper_op = 5000
-smoke_jumper_unit = 5
-
-fire_engine_dep = 60
-fire_engine_op = 2000
-fire_engine_unit = 10
-
-helicopter_dep = 45
-helicopter_op = 10000
-helicopter_unit = 3
-
-tanker_dep = 120
-tanker_op = 15000
-tanker_unit = 2
-
-ground_crew_dep = 90
-ground_crew_op = 3000
-ground_crew_unit = 8
-
-fire_severity_data = {
-    'low' : 50000,
-"medium" : 100000,
-"high" : 200000
-}
+from CONSTANTS import (
+    fire_severity_price, available_units, fire_severity_data
+)
 
 file_name = 'historical_wildfiredata.csv'
 
 fires = []
 with open(file_name, 'r') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    for row in csv_reader:
+    df = pd.read_csv(csv_file)
+
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df['fire_start_time'] = pd.to_datetime(df['fire_start_time'])
+
+    # difference
+    df['received'] = df['timestamp'] - df['fire_start_time']
+
+    df_sorted = df.sort_values(by='received')
+
+#IDFK il est 3am i just copy pasted from AI kms
+    for _, row in df_sorted.iterrows():
         fires.append({
             'timestamp': row['timestamp'],
             'fire_start_time': row['fire_start_time'],
             'location': row['location'],
             'severity': row['severity']
         })
-        
-available_units = {
-    'smoke_jumpers': {'deployment_time': smoke_jumper_dep, 'operation_cost': smoke_jumper_op, 'units_available': smoke_jumper_unit},
-    'fire_engines': {'deployment_time': fire_engine_dep, 'operation_cost': fire_engine_op, 'units_available': fire_engine_unit},
-    'helicopters': {'deployment_time': helicopter_dep, 'operation_cost': helicopter_op, 'units_available': helicopter_unit},
-    'tanker_planes': {'deployment_time': tanker_dep, 'operation_cost': tanker_op, 'units_available': tanker_unit},
-    'ground_crews': {'deployment_time': ground_crew_dep, 'operation_cost': ground_crew_op, 'units_available': ground_crew_unit}
-}
+
 
 num_fires_addressed = {'low': 0, 'medium': 0, 'high': 0}
 num_fires_delayed = {'low': 0, 'medium': 0, 'high': 0}
@@ -55,40 +36,103 @@ total_operational_costs = 0
 damage_costs = {'low': 0, 'medium': 0, 'high': 0}
 fire_severity = {'low': 0, 'medium': 0, 'high': 0}
 
-def deploy_resource(fire):
+
+def high_severity(fire):
     global total_operational_costs
 
-    #seveirty is strings
     severity = fire['severity']
-    optimal_resource = None
-    min_cost = float('inf')
+    cost = 0
 
-    # TODO: check time
+    if severity == 'high':
+        fire_severity['high'] += 1
+        check = all(available_units[unit]['units_available'] > 0 for unit in fire_severity_data['high'])
 
+        if check:
+            num_fires_addressed['high'] += 1
+            for unit in fire_severity_data['high']:
+                available_units[unit]['units_available'] -= 1
+                cost += available_units[unit]['operation_cost']
+            total_operational_costs += cost
+            return True
+        else:
+            num_fires_delayed['high'] += 1
+            damage_costs['high'] += fire_severity_price['high']
+            return False
 
-    # TODO: check money
+def time_severity(fire):
+    cost = 0
+    severity = fire['severity']
 
-    for resource_name, resource_data in available_units.items():
-        if resource_data['units_available'] > 0:
-            cost = resource_data['operation_cost']
-            if cost < min_cost:
-                optimal_resource = resource_name
-                min_cost = cost
+    if severity == 'medium':
+        fire_severity['medium'] += 1
+        check = all(available_units[unit]['units_available'] > 0 for unit in fire_severity_data['medium'])
 
-    if optimal_resource:
-        available_units[optimal_resource]['units_available'] -= 1
-        total_operational_costs += available_units[optimal_resource]['operation_cost']
-        num_fires_addressed[severity] += 1
-        fire_severity[severity] += 1
+        if check:
+            num_fires_addressed['medium'] += 1
+            for unit in fire_severity_data['medium']:
+                available_units[unit]['units_available'] -= 1
+                cost += available_units[unit]['operation_cost']
+            total_operational_costs += cost
+        else:
+            if available_units['helicopters']['units_available'] >0:
+                num_fires_addressed['medium'] += 1
+                available_units['helicopters']['units_available'] -= 1
+                total_operational_costs += available_units['helicopters']['operation_cost']
+            else:
+                num_fires_delayed['medium'] += 1
+                damage_costs['medium'] += fire_severity_price['medium']
 
-    else:
-        num_fires_delayed[severity] += 1
-        damage_cost = fire_severity_data[severity]
-        total_operational_costs += damage_cost
-        damage_costs[severity] = damage_cost
+    elif severity == 'low':
+        deployed = ''
+        check = False
+        fire_severity['low'] += 1
+        for deployments in fire_severity_data['low']:
+            if available_units[deployments]['units_available'] > 0:
+                check = True
+                deployed = deployments
+                available_units[deployed]['units_available'] -= 1
+                break
 
-for fire in fires:
-    deploy_resource(fire)
+        if check:
+            num_fires_addressed['low'] += 1
+            total_operational_costs += available_units[deployed]['operation_cost']
+        else:
+            num_fires_delayed['low'] +=1
+            damage_costs['low'] += fire_severity_price['low']
+           
+
+#high severity
+    for fire in fires:
+        if fire['severity'] == 'high':
+            if high_severity(fire):
+                fires.remove(fire)
+    
+#shortest time
+    for fire in fires:
+        # TODO: implement function that just reads the variables
+        # table should already have been ordered
+
+        time_severity(fire)
+
+    # for resource_name, resource_data in available_units.items():
+
+    #     if resource_data['units_available'] > 0:
+    #         cost = resource_data['operation_cost']
+    #         if cost < min_cost:
+    #             optimal_resource = resource_name
+    #             min_cost = cost
+
+    # if optimal_resource:
+    #     available_units[optimal_resource]['units_available'] -= 1
+    #     total_operational_costs += available_units[optimal_resource]['operation_cost']
+    #     num_fires_addressed[severity] += 1
+    #     fire_severity[severity] += 1
+
+    # else:
+    #     num_fires_delayed[severity] += 1
+    #     damage_cost = fire_severity_data[severity]
+    #     total_operational_costs += damage_cost
+    #     damage_costs[severity] = damage_cost
 
 print(f"Number of fires addressed: {sum(num_fires_addressed.values())}")
 print(f"Number of fires delayed: {sum(num_fires_delayed.values())}") 

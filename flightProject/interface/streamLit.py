@@ -17,6 +17,8 @@ if Custom_Button:
 		custom1 = st.text_input("Custom1", key="gate1", placeholder="Enter a number")
 	with right_input:
 		custom2 = st.text_input("Custom2", key="gate2", placeholder="Enter a number")
+		
+    #custom_df = 
 
 
 # TODO Create a place to display the data frame s
@@ -26,7 +28,7 @@ dataframe = pd.DataFrame({
     'second column': [10, 20, 30, 40]
 })
 
-st.dataframe(dataframe)
+st.dataframe(dataframe, hide_index=True)
 
 
 # TODO Create a section on the right to display some analytics boxes 
