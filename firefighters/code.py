@@ -24,7 +24,8 @@ low=50000
 medium=100000
 high=200000
 
-with open('historical_wildfiredata.csv','r') as csv_file:
+
+with open('C:/Users/hgudi/ConHackathon/Firefighters/conuhacks_ix/firefighters/historical_wildfiredata.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
     for row in csv_reader:
