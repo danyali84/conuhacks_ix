@@ -1,5 +1,4 @@
 import csv
-import os
 
 smoke_jumper_dep=30
 smoke_jumper_op=5000
@@ -25,8 +24,7 @@ low=50000
 medium=100000
 high=200000
 
-
-file_path = os.path.join(os.path.dirname(__file__), 'C:/Users/hgudi/ConHackathon/Firefighters/conuhacks_ix/firefighters/historical_wildfiredata.csv')
-with open(file_path,  'r') as csv_file:
-    csv_reader = csv_file.read()
-    print(csv_reader)
+with open('historical_wildfiredata.csv', mode ='r')as file:
+  csvFile = csv.reader(file)
+  for lines in csvFile:
+        print(lines)
