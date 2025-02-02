@@ -10,7 +10,6 @@ file_name = 'current_wildfiredata.csv'
 fires = []
 with open(file_name, 'r') as csv_file:
     csv_reader = csv.DictReader(csv_file)
-    #fire_records = sorted(csv_reader, key=lambda row: pd.to_datetime(row['timestamp']) - pd.to_datetime(row['fire_start_time']))
 
     for row in csv_reader:
         fires.append({
