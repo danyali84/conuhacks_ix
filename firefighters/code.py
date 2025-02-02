@@ -5,6 +5,7 @@ from CONSTANTS import (
     fire_severity_price, available_units, fire_severity_data
 )
 
+
 file_name = 'historical_wildfiredata.csv'
 
 fires = []
